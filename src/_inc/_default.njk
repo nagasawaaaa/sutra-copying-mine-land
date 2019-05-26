@@ -1,0 +1,29 @@
+{%- import root + vars.include_path.config + "/_macros.njk" as macros -%}
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block page_title %}ページタイトル{% endblock %} | {{ vars.site_name }}</title>
+  <meta name="description" content="{% block page_description %}Default Description{% endblock %}">
+  <meta name="keywords" content="{% block page_keywords %}key1,key2,key3,key4{% endblock %}">
+  {% block css_library %}{% endblock %}
+{#  <link rel="stylesheet" href="{{ vars.asset_path.css }}/style.css">#}
+</head>
+
+<body id="{% block body_id %}{% endblock %}" class="{% block body_class %}{% endblock %}">
+{# include root + vars.include_path.layout + "/_header.njk" #}
+
+{# include root + vars.include_path.layout + "/_gnav.njk" #}
+
+{% block contents %}
+  <p>コンテンツ</p>
+{% endblock %}
+
+{# include root + vars.include_path.layout + "/_footer.njk" #}
+{% block js_library %}{% endblock %}
+<script src="{{ vars.asset_path.js }}/script.js"></script>
+</body>
+</html>

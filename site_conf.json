@@ -1,0 +1,13 @@
+{
+  "site_name" : "Site Name",
+  "include_path": {
+    "root": "/_inc",
+    "config": "/_inc/_config",
+    "layout": "/_inc/_layout"
+  },
+  "asset_path" : {
+    "css": "/assets/css",
+    "js" : "/assets/js",
+    "img": "/assets/img"
+  }
+}

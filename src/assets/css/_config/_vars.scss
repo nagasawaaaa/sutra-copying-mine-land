@@ -1,0 +1,57 @@
+// -------------------------------------------------------------------
+// Variables
+// -------------------------------------------------------------------
+
+// General
+// -------------------------------------------------------------------
+
+$contSpaceValue: 15;
+$contSpace: $contSpaceValue + px;
+$innerContWidthValue: 1080;
+$contWidth: $innerContWidthValue + $contSpaceValue * 2 + px;
+
+
+//
+//Media-query
+//
+$breakpoints: (
+  's': 576,
+  'm': 768
+);
+
+// Color
+// -------------------------------------------------------------------
+$red: #e13626;
+$cherryBlossom: #fff0f0;
+
+// Text
+// -------------------------------------------------------------------
+$fz-base: 1.6rem;
+$lht-base: 1.5;
+$fc-base: #333;
+$fc-accent: $red;
+
+
+// Interaction
+// -------------------------------------------------------------------
+
+//
+//Opacity
+//
+$hoverOpacity: .75;
+
+//
+//Transition
+//
+$transSpeed: .25s;
+
+
+
+// Grid System
+// -------------------------------------------------------------------
+$bp-md: map-get($breakpoints, m);
+$alsoSm: false;
+@if map-has-key($breakpoints, s) {
+  $alsoSm: true;
+  $bp-sm: map-get($breakpoints, s) !global;
+}

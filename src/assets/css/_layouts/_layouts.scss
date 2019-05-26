@@ -1,0 +1,34 @@
+// Header
+// -------------------------------------------------------------------
+.ly_header {
+  $wrp: '.ly_header';
+  background-color: $cherryBlossom;
+
+  &_inner{
+    @include contentCentering();
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+  }
+}
+
+
+// Body
+// -------------------------------------------------------------------
+.ly_body {
+  @include contentCentering();
+}
+
+
+// Footer
+// -------------------------------------------------------------------
+.ly_footer {
+  $wrp: '.ly_footer';
+
+  &_inner{
+    @include contentCentering();
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+  }
+}

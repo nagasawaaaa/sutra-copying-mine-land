@@ -1,0 +1,169 @@
+{# ==========================================================================
+  Layouts
+  ========================================================================== #}
+{%- macro ly_body(data) %}
+  <{{ data.tag|d('div', true) }} class="ly_body">
+  {{ caller() }}
+  </{{ data.tag|d('div', true) }}>
+  <!-- /.ly_body -->
+{%- endmacro %}
+
+
+{# ==========================================================================
+  Elements
+  ========================================================================== #}
+
+{# Titles
+  ========================================================================== #}
+{%- macro el_sectTtl(data) %}
+  <h2 class="el_sectTtl {{ data.ex_class }}">{{ data.ttl|safe }}</h2>
+{%- endmacro %}
+
+{%- macro el_sectTtl02(data) %}
+  <h3 class="el_sectTtl02 {{ data.ex_class }}">{{ data.ttl|safe }}</h3>
+{%- endmacro %}
+
+
+{# Buttons
+  ========================================================================== #}
+{%- macro el_btn(data) %}
+  <a href="{{ data.url }}" class="el_btn {{ data.ex_class }}">{{ data.ttl|safe }}</a>
+{%- endmacro %}
+
+
+{# Labels
+  ========================================================================== #}
+{%- macro el_label(data) %}
+  <a href="{{ data.url }}" class="el_label {{ data.ex_class }}">{{ data.ttl|safe }}</a>
+{%- endmacro %}
+
+
+{# ==========================================================================
+  Blocks
+  ========================================================================== #}
+
+{# Sections
+  ========================================================================== #}
+{%- macro bl_sect(data) %}
+  <{{ data.tag|d('div', true)}} class="bl_sect {{ data.ex_class }}">
+  {{ caller() }}
+  </{{ data.tag|d('div', true)}}>
+  <!-- /.bl_sect -->
+{%- endmacro %}
+
+
+{# Titles
+  ========================================================================== #}
+{%- macro bl_pageTtl(data) %}
+  <h1 class="bl_pageTtl">
+    <b class="bl_pageTtl_ttl">
+      {{ data.ttl|safe }}
+    </b>
+    <span class="bl_pageTtl_cap">
+      {{ data.cap|safe }}
+    </span>
+  </h1>
+{%- endmacro %}
+
+
+{# Lists
+  ========================================================================== #}
+{%- macro bl_inlineLabelList(data) %}
+  <ul class="bl_inlineLabelList {{ data.ex_class }}">
+    {%- for item in data.items %}
+      {%- set el_label_data = {
+        ttl: item.ttl,
+        url: item.url,
+        ex_class: item.ex_class
+      } %}
+      {{ el_label(el_label_data) }}
+    {%- endfor %}
+  </ul>
+{%- endmacro %}
+
+
+{# Others
+  ========================================================================== #}
+{%- macro bl_half(data) %}
+  <div class="bl_half {{ data.ex_class }}">
+    <figure class="bl_half_img">
+      <img src="{{ data.img.src }}" alt="{{ data.img.alt|d(data.ttl, true) }}">
+    </figure>
+    <div class="bl_half_desc">
+      <p class="bl_half_desc_ttl">
+        {{ data.ttl }}
+      </p>
+      <p class="bl_half_desc_txt">
+        {{ data.txt }}
+      </p>
+      <p class="bl_half_desc_btn">
+        {{ el_btn(data.el_btn) }}
+      </p>
+    </div>
+    <!-- /.bl_half_desc -->
+  </div>
+  <!-- /.bl_half -->
+{%- endmacro %}
+
+
+{%- macro bl_cardUnit(data) %}
+  <div class="bl_cardUnit {{ data.ex_class }}">
+    {{ caller() }}
+  </div>
+  <!-- /.bl_cardUnit -->
+{%- endmacro %}
+
+{%- macro bl_card(data) %}
+  {%- for item in data %}
+    <div class="bl_card {{ item.ex_class }}">
+      <figure class="bl_card_img">
+        <img src="{{ item.img.src }}" alt="{{ item.img.alt|d(item.ttl, true) }}">
+      </figure>
+      <p class="bl_card_ttl">
+        {{ item.ttl|safe }}
+      </p>
+      <p class="bl_card_txt">
+        {{ item.txt|safe }}
+      </p>
+    </div>
+    <!-- /.bl_card -->
+  {%- endfor %}
+{%- endmacro %}
+
+{%- macro bl_bordered(data) %}
+  <div class="bl_bordered {{ data.ex_class }}">
+    <p class="bl_bordered_txt">
+      {{ data.txt|safe }}
+    </p>
+  </div>
+  <!-- /.bl_bordered -->
+{%- endmacro %}
+
+{%- macro bl_bgc(data) %}
+  <div class="bl_bgc {{ data.ex_class }}">
+    <p class="bl_bgc_txt">
+      {{ data.txt|safe }}
+    </p>
+  </div>
+  <!-- /.bl_bordered -->
+{%- endmacro %}
+
+
+{# ==========================================================================
+  Grids
+  ========================================================================== #}
+{%- macro gr_wrapper(data) %}
+  <div class="gr_wrapper {{ data.ex_class }}">
+    {{ caller() }}
+  </div>
+  <!-- /.gr_wrapper -->
+{%- endmacro %}
+
+{%- macro gr_col(data) %}
+  <div class="gr_col">
+    {{ caller() }}
+  </div>
+  <!-- /.gr_col -->
+{%- endmacro %}
+
+

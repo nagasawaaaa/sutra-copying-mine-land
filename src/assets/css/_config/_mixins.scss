@@ -1,0 +1,454 @@
+// -------------------------------------------------------------------
+// Mixins
+// -------------------------------------------------------------------
+
+// Sections
+// -------------------------------------------------------------------
+@mixin contentCentering() {
+  max-width: $contWidth;
+  padding-right: $contSpace;
+  padding-left: $contSpace;
+  margin-right: auto;
+  margin-left: auto;
+
+  @include MQ(m) {
+    max-width: 100%;
+  }
+}
+
+
+// Modules
+// -------------------------------------------------------------------
+@mixin textStyle(
+  $fz: null,
+  $fz2: null,
+  $lht: null,
+  $lht2: null,
+  $pt: null,
+  $pr: null,
+  $pb: null,
+  $pl: null,
+  $mt: null,
+  $mr: null,
+  $mb: null,
+  $ml: null
+) {
+  @if $fz == null {
+    $fz: $fz-base;
+  } @else {
+    font-size: $fz;
+  }
+  @if $lht == null {
+    $lht: $lht-base;
+  } @else {
+    line-height: $lht;
+  }
+
+  @if $pt and $pr and $pb and $pl {
+    @if $pt == $pb and $pr == $pl {
+      padding: autoSpace($pt, $fz, $lht) $pr;
+    } @else if $pr == $pl {
+      padding: autoSpace($pt, $fz, $lht) $pr autoSpace($pb, $fz, $lht);
+    }
+  } @else {
+    padding-top: autoSpace($pt, $fz, $lht);
+    padding-right: $pr;
+    padding-bottom: autoSpace($pb, $fz, $lht);
+    padding-left: $pl;
+  }
+
+  //後続要素もテキストの場合は後続要素のhalfLeadingを考慮する
+  @if $fz2 and $mb {
+    @if $lht2 == null {
+      $lht2: $lht-base;
+    }
+    $mb: autoSpace2($mb, $fz, $fz2, $lht, $lht2);
+  } @else {
+    $mb: autoSpace($mb, $fz, $lht);
+  }
+
+  //-halfLeading指定の場合はhalfLeading分をネガティブマージンで打ち消し
+  @if type-of($mt) == string and str-index($mt, -halfLeading){
+    $mt:  - halfLeading($fz, $lht);
+  } @else {
+    $mt: autoSpace($mt, $fz, $lht);
+  }
+
+  @if $mt and $mr and $mb and $ml {
+    @if $mt == $mb and $mr == $ml {
+      margin: $mt $mr;
+    } @else if $mr == $ml {
+      margin: $mt $mr $mb;
+    }
+  } @else {
+    margin-top: $mt;
+    margin-right: $mr;
+    margin-bottom: $mb;
+    margin-left: $ml;
+  }
+}
+
+@mixin lastMB0(){
+  > *:last-child {
+    margin-bottom: 0!important;
+  }
+}
+
+@mixin lastMR0(){
+  > *:last-child {
+    margin-right: 0!important;
+  }
+}
+
+
+// Interactions
+// -------------------------------------------------------------------
+@mixin FHA() {
+  &:focus,
+  &:hover,
+  &:active{
+    @content;
+  }
+}
+
+
+// MediaQuaries
+// -------------------------------------------------------------------
+@mixin MQ($size) {
+  @if not map-has-key($breakpoints, $size){
+    @warn "`#{$size}` is undefined";
+  }
+
+  @each $key, $val in $breakpoints {
+    @if $key == $size {
+      @media screen and (max-width: #{map-get($breakpoints, $key)}px) {
+        @content;
+      }
+    }
+  }
+}
+
+
+// Grid System
+// -------------------------------------------------------------------
+
+//
+// wrapper、子要素の基本的なスタイル指定
+//
+@mixin gr_wrapperStyles(
+  $display,
+  $childElm,
+  $lh,
+  $lv,
+  $mh,
+  $mv,
+  $sh: null,
+  $sv: null
+){
+  margin-top: - addPxUnit($lv);
+  @include MQ(m){
+    margin-top: -#{addPxUnit($mv)};
+  }
+
+  @if $alsoSm {
+    @include MQ(s) {
+      margin-top: -#{addPxUnit($sv)};
+    }
+  }
+
+  @if $display == 'float' {
+    @include gr_display__float($childElm);
+  } @else if $display == 'inline-table'{
+    @include gr_display__inline(inline-table, $childElm);
+  } @else if $display == 'inline-block'{
+    @include gr_display__inline(inline-block, $childElm);
+  } @else if $display == 'flex'{
+    @include gr_display__flex($childElm);
+  }
+
+  @if $childElm == '.gr_col'{
+    .gr_col > * {
+      margin: 0;
+    }
+  } @else {
+    #{$childElm} {
+      margin: 0;
+    }
+  }
+}
+
+
+//
+// display値制御
+//
+@mixin gr_display__flex($childElm){
+  display: flex;
+  flex-flow: row wrap;
+  align-content: space-between;
+  align-items: stretch;
+}
+
+@mixin gr_display__inline($display,  $childElm, $clearFloat:false){
+  display: block;
+  letter-spacing: -.55rem;
+  text-align: left;
+
+  #{$childElm}{
+    @if $clearFloat{
+      float: none;
+    }
+    display: $display;
+    letter-spacing: normal;
+    vertical-align: top;
+  }
+}
+
+@mixin gr_display__float($childElm){
+  display: block;
+
+  &::before,
+  &::after {
+    content: ' ';
+    display: table;
+  }
+  &::after {
+    clear: both;
+  }
+
+  #{$childElm}{
+    float: left;
+    display: block;
+  }
+}
+
+
+//
+// 子要素のカラム形成に関わるスタイル指定
+//
+@mixin gr_setChildsWidth($col:0, $gutter:0, $mq:true){
+  @if $col == null {
+    $col: 1;
+  }
+  $width: (100/$col);
+  @if unit($gutter) == '%'{
+    width: roundDecimal(($width - ($gutter * ($col - 1) / $col)), 3);
+    &:nth-of-type(#{$col}n){
+      margin-right: 0;
+    }
+  } @else {
+    $magicNumber: $gutter * ($col - 1) / $col;
+    width: calc(#{$width}% - #{addPxUnit($magicNumber)});
+    &:nth-of-type(#{$col}n){
+      margin-right: 0;
+    }
+  }
+
+  @if $mq {
+    @include MQ(m){
+      width: 100%;
+      margin-right: 0;
+    }
+    @if $alsoSm {
+      @include MQ(s){
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+
+//
+// 子要素のmargin-top / right設定
+//
+@mixin gr_setChildsMargin($data){
+  $childElm: map_get($data, childElm);
+
+  #{$childElm}{
+    margin-top: addPxUnit(map_get($data, lv));
+    margin-right: addPxUnit(map_get($data, lh));
+
+    @include MQ(m){
+      margin-top: addPxUnit(map_get($data, mv));
+      margin-right: addPxUnit(map_get($data, mh));
+    }
+
+    @if $alsoSm {
+      @include MQ(s) {
+        margin-top: addPxUnit(map_get($data, sv));
+        margin-right: addPxUnit(map_get($data, sh));
+      }
+    }
+  }
+}
+
+
+//
+// ラッパーと子要素のカラムモディファイア制御（Strict Gridでのみ使用）
+//
+@mixin gr_columnMqLoop($data){
+  $wrp: map-get($data, wrapperClass);
+  $maxColNum: map-get($data, maxColNum);
+  $lh: map-get($data, lh);
+  $mh: map-get($data, mh);
+  $sh: map-get($data, sh);
+
+  @for $i from 2 through $maxColNum{
+    &#{$wrp}__col#{$i}{
+      .gr_col{
+        @include gr_setChildsWidth($i, $lh);
+      }
+
+      @for $j from 2 through $maxColNum{
+        &#{$wrp}__mdCol#{$j}{
+          @include MQ(m){
+            .gr_col{
+              @include gr_setChildsWidth($j, $mh, false);
+              margin-right: addPxUnit($mh);
+            }
+          }
+
+          @if $alsoSm {
+            @include MQ(s){
+              .gr_col{
+                width: 100%;
+                margin-right: 0;
+              }
+            }
+
+            @for $k from 2 through $maxColNum {
+              &#{$wrp}__smCol#{$k} {
+                @include MQ(s) {
+                  .gr_col {
+                    @include gr_setChildsWidth($k, $sh, false);
+                    margin-right: addPxUnit($sh);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        @if $alsoSm {
+          &#{$wrp}__smCol#{$j} {
+            @include MQ(s) {
+              .gr_col {
+                @include gr_setChildsWidth($j, $sh, false);
+                margin-right: addPxUnit($sh);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+//
+// ラッパーインクルード用（Mixin Gridのみで使用）
+//
+@mixin makeChildColum(
+  $lc,
+  $lh,
+  $lv: null,
+  $mc: null,
+  $mh: null,
+  $mv: null,
+  $sc: null,
+  $sh: null,
+  $sv: null,
+  $display: flex,
+  $h-perc: true,
+  $v-perc: false,
+  $childElm: '> *'
+){
+  //mカラム指定が無ければlの値を使う
+  @if $mc == null { $mc: $lc }
+  //lvに指定が無ければlhの値を使う
+  @if $lv == null { $lv: $lh }
+  //s,mに指定が無ければlの値を使う
+  @if $mh == null { $mh: $lh }
+  @if $mv == null { $mv: $lv }
+  @if $sh == null { $sh: $lh }
+  @if $sv == null { $sv: $lv }
+
+  //%変換
+  @if $h-perc{
+    $lh: percentToCont($lh);
+    $mh: percentToCont($mh, $bp-md);
+    @if $alsoSm {
+      $sh: percentToCont($sh, $bp-sm);
+    }
+  }
+  @if $v-perc{
+    $lv: percentToCont($lv);
+    $mv: percentToCont($mv, $bp-md);
+    @if $alsoSm {
+      $sv: percentToCont($sv, $bp-sm);
+    }
+  }
+
+  @include gr_wrapperStyles(
+    $display: $display,
+    $childElm: $childElm,
+    $lh: $lh,
+    $lv: $lv,
+    $mh: $mh,
+    $mv: $mv,
+    $sh: $sh,
+    $sv: $sv
+  );
+
+  @if $alsoSm {
+    $gtrMap: (
+      'childElm': $childElm,
+      'lv': $lv,
+      'lh': $lh,
+      'mv': $mv,
+      'mh': $mh,
+      'sv': $sv,
+      'sh': $sh
+    ) !global;
+  } @else {
+    $gtrMap: (
+      'childElm': $childElm,
+      'lv': $lv,
+      'lh': $lh,
+      'mv': $mv,
+      'mh': $mh
+    ) !global;
+  }
+  @include gr_setChildsMargin($gtrMap);
+
+  #{$childElm} {
+    @include gr_setChildsWidth($lc, $lh, false);
+    @include MQ(m){
+      &:nth-of-type(#{$lc}n){
+        margin-right: addPxUnit($mh);
+      }
+
+      @include gr_setChildsWidth($mc, $mh, false);
+    }
+
+    @if $alsoSm {
+      @include MQ(s){
+        @if $sc != 0 {
+          &:nth-of-type(#{$lc}n),
+          &:nth-of-type(#{$mc}n){
+            margin-right: addPxUnit($sh);
+          }
+
+          @include gr_setChildsWidth($sc, $sh, false);
+        } @else {
+          width: 100%;
+          margin-right: 0;
+          &:nth-of-type(#{$lc}n),
+          &:nth-of-type(#{$mc}n){
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}

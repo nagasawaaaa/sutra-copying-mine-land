@@ -1,0 +1,9 @@
+# docker
+.mysql/
+.wordpress/
+
+# node
+node_modules/
+
+# minified
+**/*.min.js

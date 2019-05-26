@@ -1,0 +1,27 @@
+# os
+Thumbs.db
+.DS_Store
+
+# node
+node_modules/
+build/
+public_html/
+npm-debug.log
+
+# yarn
+yarn-error.log
+
+# docker
+.data/
+.wordpress/
+wordpress_template/.env
+
+# js
+*.min.js
+*.map
+
+# IDE
+.idea/
+
+# env
+.envrc

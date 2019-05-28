@@ -2,7 +2,6 @@ const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
 const rimraf = require('rimraf');
 const p = require('gulp-load-plugins')();
-const runSequence = require('run-sequence');
 const reload = browserSync.reload;
 const fs = require('fs');
 const path = require('path');
@@ -28,11 +27,11 @@ const loadJsonSync = (filename) => {
 
 // clean
 gulp.task('clean', (callback) => {
-  rimraf(output, callback);
+  return rimraf(output, callback);
 });
 
 //nunjucks
-gulp.task('njk', function(){
+gulp.task('njk', () => {
   return gulp.src(njkSrc)
     .pipe(p.using())
     .pipe(plumberNotify())
@@ -84,7 +83,7 @@ gulp.task('sass', () => {
 
 // server
 gulp.task('server', () => {
-  browserSync.init({
+  return browserSync.init({
     server: {
       baseDir: output,
       index: 'index.html'
@@ -92,17 +91,32 @@ gulp.task('server', () => {
   });
 });
 
-// watch
-gulp.task('watch', ['server'], () => {
-  gulp.watch(`${input}/**/*.njk`, ['njk', reload]);
-  gulp.watch(`${input}/**/*.js`, ['webpack:dev', reload]);
-  gulp.watch(`${input}/**/*.scss`, ['sass', reload ]);
-});
+function browsersync(done) {
+  browserSync.init({
+    server: {
+      baseDir: output,
+      index: 'index.html'
+    }
+  });
+  done();
+}
 
-gulp.task('default', (callback) => {
-  return runSequence(['njk', 'sass', 'webpack:dev'], 'watch', callback);
-});
+function watchFiles (done) {
+  const browserReload = () => {
+    reload();
+    done();
+  };
+  gulp.watch([`${input}/**/*.njk`]).on('change', gulp.series('njk', browserReload));
+  gulp.watch([`${input}/**/*.js`]).on('change', gulp.series('webpack:dev', browserReload));
+  gulp.watch([`${input}/**/*.scss`]).on('change', gulp.series('sass', browserReload));
+}
 
-gulp.task('build', (callback) => {
-  return runSequence('clean', ['njk', 'sass', 'webpack:prod'], callback);
-});
+
+gulp.task('default', gulp.series(
+  gulp.parallel('njk', 'sass', 'webpack:dev'),
+  gulp.series(browsersync, watchFiles)
+));
+
+gulp.task('build', gulp.series('clean',
+  gulp.parallel('njk', 'sass', 'webpack:prod')
+));

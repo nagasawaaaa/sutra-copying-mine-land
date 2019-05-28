@@ -24,7 +24,7 @@
     }
 
     for (let i = 0; i < BOMB; i++) {
-      while (true) {
+      while (true) { // eslint-disable-line
         let x = Math.floor(Math.random() * W);
         let y = Math.floor(Math.random() * H);
         if (!cell[x][y].bomb) {
